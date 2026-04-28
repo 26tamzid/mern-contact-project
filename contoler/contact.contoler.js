@@ -5,8 +5,30 @@ import contact from '../models/contact.model.js'
 // var paramId = mongoose.Types.ObjectId.isValid(req.params.id)
 
 export const contactPage = async(req,res) => {
-     const contacts =await contact.find();
-    res.render('home',{contacts})
+    try{
+    // const contacts =await contact.find();
+    const {page=1,limit = 3} = req.query
+    const options = {
+        page: parseInt(page),
+        limit : parseInt(limit)
+    }
+
+    const result = await contact.paginate({},options);
+    return res.render('home',{
+        totalDocs: result.totalDocs,
+        limit: result.limit,
+        totalPages:result.totalPages,
+        page:result.page,
+        pagingCounter:result.pagingCounter,
+        hasPrevPage: result.hasPrevPage,
+        hasNextPage: result.hasNextPage,
+        prevPage: result.prevPage,
+        nextPage: result.nextPage,
+        contacts:result.docs
+    })
+    }catch(error){
+        res.render('500',{messege:'problem in code'})
+    }
 }
 
 
